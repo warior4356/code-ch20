@@ -8,11 +8,14 @@ import passportGithub from 'passport-github';
 import session from 'express-session';
 import path from 'path';
 import express from 'express';
+import passportGoogle from 'passport-google-oauth2';
+
 
 const LOCAL_PORT = 8081;
-const DEPLOY_URL = "http://codech18eb-env.eba-a4ypmhpi.us-east-2.elasticbeanstalk.com";
+const DEPLOY_URL = "http://ch20-env.eba-rhvqsihb.us-east-1.elasticbeanstalk.com/";
 const PORT = process.env.HTTP_PORT || LOCAL_PORT;
 const GithubStrategy = passportGithub.Strategy;
+var GoogleStrategy = passportGoogle.Strategy;
 const app = express();
 
 //////////////////////////////////////////////////////////////////////////
@@ -21,9 +24,20 @@ const app = express();
 //the 'github' strategy in passport.js.
 //////////////////////////////////////////////////////////////////////////
 passport.use(new GithubStrategy({
-    clientID: "a075012c4b08543f42a8",
-    clientSecret: "8dde6978090028aee37c72df9ea7ce268678b6d3",
+    clientID: "1d90e0594c090c4a6a8b",
+    clientSecret: "97b239b3bc79632dfd4f9d197628cfac487d2086",
     callbackURL: DEPLOY_URL + "/auth/github/callback"
+  },
+  (accessToken, refreshToken, profile, done) => {
+    // TO DO: If user in profile object isn’t yet in our database, add the user here
+    return done(null, profile);
+  }
+));
+
+passport.use(new GoogleStrategy({
+    clientID:     "932434474282-at5bu4nelv37fmmklq15li2g85nlpakn.apps.googleusercontent.com",
+    clientSecret: "Nghf69OlNbqJStpCf0rjG9-T",
+    callbackURL: DEPLOY_URL + "/auth/google/callback"
   },
   (accessToken, refreshToken, profile, done) => {
     // TO DO: If user in profile object isn’t yet in our database, add the user here
@@ -33,12 +47,13 @@ passport.use(new GithubStrategy({
 
 passport.serializeUser((user, done) => {
     console.log("In serializeUser.");
+    console.log(JSON.stringify(user));
     //Note: The code does not use a back-end database. When we have back-end 
     //database, we would put user info into the database in the callback 
     //above and only serialize the unique user id into the session
     let userObject = {
-      id: user.username + "@github",
-      username : user.username,
+      id: user.displayName + "@" + user.provider,
+      displayName : user.displayName,
       provider : user.provider,
       profileImageUrl : user.photos[0].value
     };
@@ -87,6 +102,22 @@ app.get('/auth/github', passport.authenticate('github'));
 app.get('/auth/github/callback', passport.authenticate('github', { failureRedirect: '/' }),
   (req, res) => {
     console.log("auth/github/callback reached.")
+    res.redirect('/'); //sends user back to login screen; 
+                       //req.isAuthenticated() indicates status
+  }
+);
+
+//AUTHENTICATE route: Uses passport to authenticate with GitHub.
+//Should be accessed when user clicks on 'Login with GitHub' button on 
+//Log In page.
+app.get('/auth/google', passport.authenticate('google', { scope: ['profile'] }));
+
+//CALLBACK route:  GitHub will call this route after the
+//OAuth authentication process is complete.
+//req.isAuthenticated() tells us whether authentication was successful.
+app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/' }),
+  (req, res) => {
+    console.log("auth/google/callback reached.")
     res.redirect('/'); //sends user back to login screen; 
                        //req.isAuthenticated() indicates status
   }

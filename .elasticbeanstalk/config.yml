@@ -1,22 +1,19 @@
 branch-defaults:
   master:
-    environment: CodeCh18Eb-env
-    group_suffix: null
+    environment: Ch20-env
 environment-defaults:
-  CodeCh18Eb-env:
+  Ch20-env:
     branch: null
     repository: null
 global:
-  application_name: code-ch18-eb
-  branch: null
+  application_name: ch20
   default_ec2_keyname: null
   default_platform: Node.js 12 running on 64bit Amazon Linux 2
-  default_region: us-east-2
+  default_region: us-east-1
   include_git_submodules: true
   instance_profile: null
   platform_name: null
   platform_version: null
-  profile: eb-cli
-  repository: null
+  profile: null
   sc: git
   workspace_type: Application

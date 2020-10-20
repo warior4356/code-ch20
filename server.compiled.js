@@ -10,6 +10,8 @@ var _path = _interopRequireDefault(require("path"));
 
 var _express = _interopRequireDefault(require("express"));
 
+var _passportGoogleOauth = _interopRequireDefault(require("passport-google-oauth2"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 //////////////////////////////////////////////////////////////////////////
@@ -18,9 +20,10 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "d
 //variables used in the server middleware.
 //////////////////////////////////////////////////////////////////////////
 var LOCAL_PORT = 8081;
-var DEPLOY_URL = "http://codech18eb-env.eba-a4ypmhpi.us-east-2.elasticbeanstalk.com";
+var DEPLOY_URL = "http://localhost:8081";
 var PORT = process.env.HTTP_PORT || LOCAL_PORT;
 var GithubStrategy = _passportGithub["default"].Strategy;
+var GoogleStrategy = _passportGoogleOauth["default"].Strategy;
 var app = (0, _express["default"])(); //////////////////////////////////////////////////////////////////////////
 //PASSPORT SET-UP
 //The following code sets up the app with OAuth authentication using
@@ -28,22 +31,32 @@ var app = (0, _express["default"])(); //////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 
 _passport["default"].use(new GithubStrategy({
-  clientID: "a075012c4b08543f42a8",
-  clientSecret: "8dde6978090028aee37c72df9ea7ce268678b6d3",
+  clientID: "1d90e0594c090c4a6a8b",
+  clientSecret: "97b239b3bc79632dfd4f9d197628cfac487d2086",
   callbackURL: DEPLOY_URL + "/auth/github/callback"
 }, function (accessToken, refreshToken, profile, done) {
   // TO DO: If user in profile object isn’t yet in our database, add the user here
   return done(null, profile);
 }));
 
+_passport["default"].use(new GoogleStrategy({
+  clientID: "932434474282-at5bu4nelv37fmmklq15li2g85nlpakn.apps.googleusercontent.com",
+  clientSecret: "Nghf69OlNbqJStpCf0rjG9-T",
+  callbackURL: DEPLOY_URL + "/auth/google/callback"
+}, function (accessToken, refreshToken, profile, done) {
+  // TO DO: If user in profile object isn’t yet in our database, add the user here
+  return done(null, profile);
+}));
+
 _passport["default"].serializeUser(function (user, done) {
-  console.log("In serializeUser."); //Note: The code does not use a back-end database. When we have back-end 
+  console.log("In serializeUser.");
+  console.log(JSON.stringify(user)); //Note: The code does not use a back-end database. When we have back-end 
   //database, we would put user info into the database in the callback 
   //above and only serialize the unique user id into the session
 
   var userObject = {
-    id: user.username + "@github",
-    username: user.username,
+    id: user.displayName + "@" + user.provider,
+    displayName: user.displayName,
     provider: user.provider,
     profileImageUrl: user.photos[0].value
   };
@@ -90,6 +103,22 @@ app.get('/auth/github/callback', _passport["default"].authenticate('github', {
   failureRedirect: '/'
 }), function (req, res) {
   console.log("auth/github/callback reached.");
+  res.redirect('/'); //sends user back to login screen; 
+  //req.isAuthenticated() indicates status
+}); //AUTHENTICATE route: Uses passport to authenticate with GitHub.
+//Should be accessed when user clicks on 'Login with GitHub' button on 
+//Log In page.
+
+app.get('/auth/google', _passport["default"].authenticate('google', {
+  scope: ['profile']
+})); //CALLBACK route:  GitHub will call this route after the
+//OAuth authentication process is complete.
+//req.isAuthenticated() tells us whether authentication was successful.
+
+app.get('/auth/google/callback', _passport["default"].authenticate('google', {
+  failureRedirect: '/'
+}), function (req, res) {
+  console.log("auth/google/callback reached.");
   res.redirect('/'); //sends user back to login screen; 
   //req.isAuthenticated() indicates status
 }); //LOGOUT route: Use passport's req.logout() method to log the user out and

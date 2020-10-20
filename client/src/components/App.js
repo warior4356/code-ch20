@@ -52,7 +52,7 @@ class App extends React.Component {
               data = {
                 password: '',
                 profilePicURL: obj.user.profileImageUrl,
-                displayName: obj.user.username,
+                displayName: obj.user.displayName,
                 securityQuestion: '',
                 securityAnswer: '',
                 rounds: {}, 
