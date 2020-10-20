@@ -22,17 +22,17 @@
   },
   "devDependencies": {
     "@babel/cli": "^7.12.1",
-    "@babel/core": "^7.12.1",
+    "@babel/core": "^7.12.3",
     "@babel/node": "^7.12.1",
     "@babel/preset-env": "^7.12.1",
-    "nodemon": "^2.0.5"
+    "nodemon": "^2.0.6"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/wsu-cpts489-fa20/code-ch20.git"
+    "url": "git+https://github.com/warior4356/code-ch20.git"
   },
   "bugs": {
-    "url": "https://github.com/wsu-cpts489-fa20/code-ch20/issues"
+    "url": "https://github.com/warior4356/code-ch20/issues"
   },
-  "homepage": "https://github.com/wsu-cpts489-fa20/code-ch20#readme"
+  "homepage": "https://github.com/warior4356/code-ch20#readme"
 }
