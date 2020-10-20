@@ -12,7 +12,7 @@ import passportGoogle from 'passport-google-oauth2';
 
 
 const LOCAL_PORT = 8081;
-const DEPLOY_URL = "http://ch20-env.eba-rhvqsihb.us-east-1.elasticbeanstalk.com/";
+const DEPLOY_URL = "http://ch20-env.eba-rhvqsihb.us-east-1.elasticbeanstalk.com";
 const PORT = process.env.HTTP_PORT || LOCAL_PORT;
 const GithubStrategy = passportGithub.Strategy;
 var GoogleStrategy = passportGoogle.Strategy;
